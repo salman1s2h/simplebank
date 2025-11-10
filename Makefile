@@ -1,51 +1,23 @@
-name: ci-test
+DB_URL=postgresql://admin:admin@localhost:5433/go_db?sslmode=disable
 
-on:
-  push:
-    branches: [ "main" ]
-  pull_request:
-    branches: [ "main" ]
+createdb:
+	docker exec -it postgres_container createdb -U postgres go_db
 
-jobs:
-  build:
-    runs-on: ubuntu-latest
+dropdb:
+	docker exec -it postgres_container dropdb -U postgres go_db
 
-    services:
-      postgres:
-        image: postgres:13
-        env:
-          POSTGRES_USER: admin
-          POSTGRES_PASSWORD: admin
-          POSTGRES_DB: go_db
-        ports:
-          - 5433:5432
-        options: >-
-          --health-cmd pg_isready -U admin
-          --health-interval 10s
-          --health-timeout 5s
-          --health-retries 5
+migrateup:
+	migrate -path db/migration -database "$(DB_URL)" -verbose up
 
-    steps:
-    - uses: actions/checkout@v4
 
-    - name: Set up Go
-      uses: actions/setup-go@v4
-      with:
-        go-version: '1.25.1'
+migratedown:
+	migrate -path db/migration -database "$(DB_URL)" -verbose down
 
-    - name: Install migrate CLI
-      run: |
-        curl -L https://github.com/golang-migrate/migrate/releases/latest/download/migrate.linux-amd64.tar.gz | tar xvz
-        sudo mv migrate /usr/local/bin/
-        migrate -version  # sanity check
+sqlc:
+	sqlc generate
 
-    - name: Build
-      run: go build -v ./...
+test:
+	go test -v ./...
 
-    - name: Migrate up
-      env:
-        DB_URL: postgresql://admin:admin@localhost:5433/go_db?sslmode=disable
-      run: make migrateup
 
-    - name: Test
-      run: go test -v ./...
+.PHONY: network postgres createdb dropdb migrateup migratedown sqlc test
