@@ -1,3 +1,6 @@
+# This workflow will build a golang project
+# For more information see: https://docs.github.com/en/actions/automating-builds-and-tests/building-and-testing-go
+
 name: ci-test
 
 on:
@@ -7,20 +10,26 @@ on:
     branches: [ "main" ]
 
 jobs:
+
   build:
     runs-on: ubuntu-latest
 
+    # Service containers to run with `container-job`
     services:
+      # Label used to access the service container
       postgres:
+        # Docker Hub image
         image: postgres:13
+        # Provide the password for postgres
         env:
           POSTGRES_USER: admin
           POSTGRES_PASSWORD: admin
           POSTGRES_DB: go_db
         ports:
           - 5433:5432
+        # Set health checks to wait until postgres has started
         options: >-
-          --health-cmd pg_isready -U admin
+          --health-cmd pg_isready
           --health-interval 10s
           --health-timeout 5s
           --health-retries 5
@@ -45,6 +54,13 @@ jobs:
     - name: Migrate up
       env:
         DB_URL: postgresql://admin:admin@localhost:5433/go_db?sslmode=disable
+      run: make migrateup
+
+      
+    - name: Build
+      run: go build -v ./...
+
+    - name: Make
       run: make migrateup
 
     - name: Test
