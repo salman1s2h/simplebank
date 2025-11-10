@@ -90,10 +90,13 @@ func TestTransferTx(t *testing.T) {
 
 		fmt.Println(">> tx:", fromAccount.Balance, toAccount.Balance)
 
-		diff1 := fromAccount.Balance - account1.Balance // money deducted from sender
-		diff2 := account2.Balance - toAccount.Balance   // money added to receiver
+		diff1 := account1.Balance - fromAccount.Balance // money deducted from sender
+		diff2 := toAccount.Balance - account2.Balance   // money added to receiver
 
 		require.Equal(t, diff1, diff2)
+		fmt.Println("diff1 :", diff1)
+		fmt.Println("diff2 :", diff1)
+
 		require.True(t, diff1 > 0)
 		require.True(t, diff1%amount == 0)
 
