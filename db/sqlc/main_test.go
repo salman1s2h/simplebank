@@ -17,7 +17,7 @@ const (
 
 var testQueries *Queries
 var testDB *sql.DB
-var testStore *Store // ✅ add this line
+var testStore *Store
 
 func TestMain(m *testing.M) {
 	var err error
@@ -27,7 +27,7 @@ func TestMain(m *testing.M) {
 	}
 	fmt.Printf("Connected to db successfully %v", testDB.Stats())
 	testQueries = New(testDB)
-	testStore = NewStore(testDB) // ✅ initialize store here
+	testStore = NewStore(testDB)
 
 	os.Exit(m.Run())
 }
