@@ -97,7 +97,7 @@ func (q *Queries) GetTransferFRM(ctx context.Context, arg GetTransferFRMParams) 
 		return nil, err
 	}
 	defer rows.Close()
-	var items []Transfer
+	items := []Transfer{}
 	for rows.Next() {
 		var i Transfer
 		if err := rows.Scan(
@@ -136,7 +136,7 @@ func (q *Queries) GetTransferTO(ctx context.Context, arg GetTransferTOParams) ([
 		return nil, err
 	}
 	defer rows.Close()
-	var items []Transfer
+	items := []Transfer{}
 	for rows.Next() {
 		var i Transfer
 		if err := rows.Scan(
