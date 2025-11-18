@@ -8,8 +8,6 @@ import (
 
 const (
 	USD      = "USD"
-	EUR      = "EUR"
-	CAD      = "CAD"
 	alphabet = "abcdefghijklmnopqrstuvwxyz"
 )
 
