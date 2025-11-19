@@ -1,6 +1,7 @@
 package api
 
 import (
+	"database/sql"
 	"encoding/json"
 	"fmt"
 	"io"
@@ -39,25 +40,28 @@ func TestGetAccountAPI(t *testing.T) {
 				requireBodyMatchAccount(t, recorder, account)
 			},
 		},
-		// {
-		// 	name:      "NotFound",
-		// 	AccountID: account.ID,
-		// 	buildStubs: func(store *mockdb.MockStore) {
-		// 		// store.EXPECT().
-		// 		// 	GetAccountByID(gomock.Any(), gomock.Eq(account.ID)).
-		// 		// 	Times(1).
-		// 		// 	Return(db.Account{}, sql.ErrNoRows)
-		// 		store.EXPECT().
-		// 			GetAccountByID(gomock.Any(), gomock.Any()).
-		// 			Times(1).
-		// 			Return(db.Account{}, sql.ErrNoRows)
-		// 	},
-		// 	checkResponse: func(t *testing.T, recorder *httptest.ResponseRecorder) {
-		// 		require.Equal(t, http.StatusNotFound, recorder.Code)
-		// 		fmt.Println("Response Body:", recorder.Body.String())
-		// 		requireBodyMatchAccount(t, recorder, account)
-		// 	},
-		// },
+		{
+			name:      "NotFound",
+			AccountID: account.ID,
+			buildStubs: func(store *mockdb.MockStore) {
+				store.EXPECT().
+					GetAccountByID(gomock.Any(), gomock.Eq(account.ID)).
+					Times(1).
+					Return(db.Account{}, sql.ErrNoRows)
+			},
+			checkResponse: func(t *testing.T, recorder *httptest.ResponseRecorder) {
+				require.Equal(t, http.StatusNotFound, recorder.Code)
+
+				data, err := io.ReadAll(recorder.Body)
+				require.NoError(t, err)
+
+				var response map[string]string
+				err = json.Unmarshal(data, &response)
+				require.NoError(t, err)
+
+				require.Contains(t, response["error"], "not found")
+			},
+		},
 	}
 	for i := range testCash {
 		tc := testCash[i]
