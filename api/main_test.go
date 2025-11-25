@@ -12,7 +12,7 @@ import (
 )
 
 func newTestServer(t *testing.T, store db.Store) *Server {
-	config := util.Env{
+	config := &util.Env{
 		TOKEN_SYMMETRIC_KEY:   util.RandomString(32),
 		ACCESS_TOKEN_DURATION: time.Minute,
 	}

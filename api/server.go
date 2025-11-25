@@ -10,14 +10,14 @@ import (
 )
 
 type Server struct {
-	config     util.Env
+	config     *util.Env
 	store      db.Store
 	tokenMaker token.Maker
 	router     *gin.Engine
 }
 
 // NewServer creates a new HTTP server and setup routing
-func NewServer(config util.Env, Store db.Store) (*Server, error) {
+func NewServer(config *util.Env, Store db.Store) (*Server, error) {
 	tokenMaker, err := token.NewPasetoMaker(config.TOKEN_SYMMETRIC_KEY)
 	if err != nil {
 		panic(err)
