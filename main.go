@@ -32,7 +32,10 @@ func main() {
 	}
 	store := db.NewStore(conn)
 
-	server := api.NewServer(store)
+	server, err := api.NewServer(env_obj, store)
+	if err != nil {
+		log.Fatal("cannot create server:", err)
+	}
 	serverAddr := fmt.Sprintf("%s:%s", env_obj.ServerAddress, env_obj.APP_PORT)
 
 	log.Printf("Starting server at %s", serverAddr)

@@ -2,26 +2,29 @@ package util
 
 import (
 	"log"
+	"time"
 
 	"github.com/spf13/viper"
 )
 
 type Env struct {
-	AppEnv                 string `mapstructure:"APP_ENV"`
-	ServerAddress          string `mapstructure:"SERVER_ADDRESS"`
-	ContextTimeout         int    `mapstructure:"CONTEXT_TIMEOUT"`
-	DBHost                 string `mapstructure:"DB_HOST"`
-	DBPort                 string `mapstructure:"DB_PORT"`
-	DBUser                 string `mapstructure:"DB_USER"`
-	DBPass                 string `mapstructure:"DB_PASS"`
-	DBName                 string `mapstructure:"DB_NAME"`
-	AccessTokenExpiryHour  int    `mapstructure:"ACCESS_TOKEN_EXPIRY_HOUR"`
-	RefreshTokenExpiryHour int    `mapstructure:"REFRESH_TOKEN_EXPIRY_HOUR"`
-	AccessTokenSecret      string `mapstructure:"ACCESS_TOKEN_SECRET"`
-	RefreshTokenSecret     string `mapstructure:"REFRESH_TOKEN_SECRET"`
-	DB_DRIVER              string `mapstructure:"DB_DRIVER"`
-	SERVER_ADDRESS         string `mapstructure:"SERVER_ADDRESS"`
-	APP_PORT               string `mapstructure:"APP_PORT"`
+	AppEnv         string `mapstructure:"APP_ENV"`
+	ServerAddress  string `mapstructure:"SERVER_ADDRESS"`
+	ContextTimeout int    `mapstructure:"CONTEXT_TIMEOUT"`
+	DBHost         string `mapstructure:"DB_HOST"`
+	DBPort         string `mapstructure:"DB_PORT"`
+	DBUser         string `mapstructure:"DB_USER"`
+	DBPass         string `mapstructure:"DB_PASS"`
+	DBName         string `mapstructure:"DB_NAME"`
+	// AccessTokenExpiryHour  int    `mapstructure:"ACCESS_TOKEN_EXPIRY_HOUR"`
+	// RefreshTokenExpiryHour int    `mapstructure:"REFRESH_TOKEN_EXPIRY_HOUR"`
+	AccessTokenSecret     string        `mapstructure:"ACCESS_TOKEN_SECRET"`
+	RefreshTokenSecret    string        `mapstructure:"REFRESH_TOKEN_SECRET"`
+	DB_DRIVER             string        `mapstructure:"DB_DRIVER"`
+	SERVER_ADDRESS        string        `mapstructure:"SERVER_ADDRESS"`
+	APP_PORT              string        `mapstructure:"APP_PORT"`
+	TOKEN_SYMMETRIC_KEY   string        `mapstructure:"TOKEN_SYMMETRIC_KEY"`
+	ACCESS_TOKEN_DURATION time.Duration `mapstructure:"ACCESS_TOKEN_DURATION"`
 }
 
 func NewEnv() *Env {
@@ -44,5 +47,6 @@ func NewEnv() *Env {
 		log.Println("The App is running in development env")
 	}
 
+	// return &env
 	return &env
 }
