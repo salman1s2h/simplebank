@@ -1,6 +1,8 @@
 package api
 
 import (
+	"fmt"
+
 	"github.com/gin-gonic/gin"
 	"github.com/gin-gonic/gin/binding"
 	"github.com/go-playground/validator/v10"
@@ -18,10 +20,12 @@ type Server struct {
 
 // NewServer creates a new HTTP server and setup routing
 func NewServer(config *util.Env, Store db.Store) (*Server, error) {
+	fmt.Printf("Server Config: %+v\n", config)
 	tokenMaker, err := token.NewPasetoMaker(config.TOKEN_SYMMETRIC_KEY)
 	if err != nil {
 		panic(err)
 	}
+	fmt.Printf("Token Maker: %+v\n", tokenMaker)
 	server := &Server{
 		config:     config,
 		tokenMaker: tokenMaker,
@@ -58,7 +62,7 @@ func (server *Server) setupRouter() {
 	router := gin.Default()
 
 	router.POST("/users", server.createUser)
-	// router.POST("/users/login", server.loginUser)
+	router.POST("/users/login", server.loginUser)
 	// router.POST("/tokens/renew_access", server.renewAccessToken)
 
 	// authRoutes := router.Group("/").Use(authMiddleware(server.tokenMaker))
