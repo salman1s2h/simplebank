@@ -8,27 +8,34 @@ import (
 	"net/http"
 	"net/http/httptest"
 	"testing"
+	"time"
 
 	"github.com/golang/mock/gomock"
 	mockdb "github.com/salman1s2h/simplebank/db/mock"
 	db "github.com/salman1s2h/simplebank/db/sqlc"
+	"github.com/salman1s2h/simplebank/token"
 	"github.com/salman1s2h/simplebank/util"
 	"github.com/stretchr/testify/require"
 )
 
 func TestGetAccountAPI(t *testing.T) {
 
-	account := randomAccount()
+	user, _ := randomUser(t)
+	account := randomAccount(user.Username)
 
 	testCash := []struct {
 		name          string
 		AccountID     int64
+		setupAuth     func(t *testing.T, request *http.Request, tokenMaker token.Maker)
 		buildStubs    func(store *mockdb.MockStore)
 		checkResponse func(t *testing.T, recorder *httptest.ResponseRecorder)
 	}{
 		{
 			name:      "OK",
 			AccountID: account.ID,
+			setupAuth: func(t *testing.T, request *http.Request, tokenMaker token.Maker) {
+				addAuthorization(t, request, tokenMaker, authorizationTypeBearer, user.Username, time.Minute)
+			},
 			buildStubs: func(store *mockdb.MockStore) {
 				store.EXPECT().
 					GetAccountByID(gomock.Any(), gomock.Eq(account.ID)).
@@ -43,6 +50,9 @@ func TestGetAccountAPI(t *testing.T) {
 		{
 			name:      "NotFound",
 			AccountID: account.ID,
+			setupAuth: func(t *testing.T, request *http.Request, tokenMaker token.Maker) {
+				addAuthorization(t, request, tokenMaker, authorizationTypeBearer, user.Username, time.Minute)
+			},
 			buildStubs: func(store *mockdb.MockStore) {
 				store.EXPECT().
 					GetAccountByID(gomock.Any(), gomock.Eq(account.ID)).
@@ -78,6 +88,7 @@ func TestGetAccountAPI(t *testing.T) {
 			urlPath := fmt.Sprintf("/accounts/%d", account.ID)
 			request, err := http.NewRequest(http.MethodGet, urlPath, nil)
 			require.NoError(t, err)
+			tc.setupAuth(t, request, server.tokenMaker)
 			server.router.ServeHTTP(recorder, request)
 			tc.checkResponse(t, recorder)
 
@@ -86,12 +97,12 @@ func TestGetAccountAPI(t *testing.T) {
 	}
 }
 
-func randomAccount() db.Account {
+func randomAccount(owner string) db.Account {
 	// user := createRandomUser(nil)
 	return db.Account{
-		ID:    util.RandomInt(1, 1000),
-		Owner: util.RandomOwner(),
-		// Owner:    user.Username,
+		ID: util.RandomInt(1, 1000),
+		// Owner: util.RandomOwner(),
+		Owner:    owner,
 		Balance:  util.RandomMoney(),
 		Currency: util.RandomCurrency(),
 		// CreatedAt: time.Now(),

@@ -9,6 +9,7 @@ import (
 	"github.com/gin-gonic/gin"
 	"github.com/lib/pq"
 	db "github.com/salman1s2h/simplebank/db/sqlc"
+	"github.com/salman1s2h/simplebank/token"
 )
 
 type CreateAccountRequest struct {
@@ -25,9 +26,14 @@ func (server *Server) createAccount(ctx *gin.Context) {
 		ctx.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return
 	}
-
+	authPlayload := ctx.MustGet(authorizationPayloadKey).(*token.Payload)
+	if authPlayload.Username != req.Owner {
+		err := fmt.Errorf("account owner mismatch")
+		ctx.JSON(http.StatusUnauthorized, errorResponse(err))
+		return
+	}
 	arg := db.CreateAccountParams{
-		Owner:    req.Owner,
+		Owner:    authPlayload.Username,
 		Currency: req.Currency,
 		Balance:  0,
 	}
@@ -72,6 +78,13 @@ func (server *Server) getAccount(ctx *gin.Context) {
 			return
 		}
 		ctx.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		return
+	}
+
+	authPlayload := ctx.MustGet(authorizationPayloadKey).(*token.Payload)
+	if authPlayload.Username != account.Owner {
+		err := fmt.Errorf("account owner mismatch")
+		ctx.JSON(http.StatusUnauthorized, errorResponse(err))
 		return
 	}
 

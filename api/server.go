@@ -42,14 +42,6 @@ func NewServer(config *util.Env, Store db.Store) (*Server, error) {
 		panic(err)
 	}
 
-	// router.POST("/accounts", server.createAccount)
-	// router.GET("/accounts/:id", server.getAccount)
-	// router.GET("/accounts", server.listAccounts)
-	// router.POST("/users", server.createUser)
-	// router.GET("/users/:username", server.getUser)
-
-	// router.POST("/transfers", server.createTransfer)
-	// server.router = router
 	server.setupRouter()
 	return server, nil
 }
@@ -65,12 +57,12 @@ func (server *Server) setupRouter() {
 	router.POST("/users/login", server.loginUser)
 	// router.POST("/tokens/renew_access", server.renewAccessToken)
 
-	// authRoutes := router.Group("/").Use(authMiddleware(server.tokenMaker))
-	router.POST("/accounts", server.createAccount)
-	router.GET("/accounts/:id", server.getAccount)
-	router.GET("/accounts", server.listAccounts)
+	authRoutes := router.Group("/").Use(authMiddleware(server.tokenMaker))
+	authRoutes.POST("/accounts", server.createAccount)
+	authRoutes.GET("/accounts/:id", server.getAccount)
+	authRoutes.GET("/accounts", server.listAccounts)
 
-	router.POST("/transfers", server.createTransfer)
+	authRoutes.POST("/transfers", server.createTransfer)
 
 	server.router = router
 }

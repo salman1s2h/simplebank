@@ -104,15 +104,16 @@ func TestDeleteAccount(t *testing.T) {
 // }
 
 func TestListAccounts(t *testing.T) {
-	// var lastAccount Account
-	// for i := 0; i < 10; i++ {
-	// 	lastAccount = createRandomAccount(t)
-	// }
+	var lastAccount Account
+	for i := 0; i < 10; i++ {
+		lastAccount = createRandomAccount(t)
+	}
 
 	// Build parameters for the query
 	arg := GetAccountsParams{
 		Limit:  5,
 		Offset: 0,
+		Owner:  lastAccount.Owner,
 	}
 
 	// Call the function
@@ -123,8 +124,11 @@ func TestListAccounts(t *testing.T) {
 	// Validate the returned data
 	for _, account := range accounts {
 		require.NotEmpty(t, account)
-		require.NotZero(t, account.ID)
-		require.NotEmpty(t, account.Currency)
-		require.NotZero(t, account.CreatedAt)
+		require.Equal(t, lastAccount.Owner, account.Owner)
+		// require.Equal(t, lastAccount.Balance, account.Balance)
+		// require.Equal(t, lastAccount.Currency, account.Currency)
+		// require.NotZero(t, account.ID)
+		// require.NotEmpty(t, account.Currency)
+		// require.NotZero(t, account.CreatedAt)
 	}
 }

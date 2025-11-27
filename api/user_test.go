@@ -30,16 +30,24 @@ func (e eqCreateUserParamsMatcher) Matches(x interface{}) bool {
 		return false
 	}
 
-	// compare simple fields
-	if e.arg.Username != arg.Username ||
-		e.arg.FullName != arg.FullName ||
-		e.arg.Email != arg.Email {
+	// Compare simple fields
+	if e.arg.Username != arg.Username {
+		return false
+	}
+	if e.arg.FullName != arg.FullName {
+		return false
+	}
+	if e.arg.Email != arg.Email {
 		return false
 	}
 
-	// Check hashed password is correct
-	err := util.CheckPassword(e.password, arg.HashedPassword)
-	return err == nil
+	// Check hashed password using bcrypt
+	if err := util.CheckPassword(e.password, arg.HashedPassword); err != nil {
+		return false
+	}
+
+	// DO NOT DeepEqual, because hash will be different every time
+	return true
 }
 
 func (e eqCreateUserParamsMatcher) String() string {
@@ -62,10 +70,10 @@ func TestCreateUserAPI(t *testing.T) {
 		// {
 		// 	name: "OK",
 		// 	body: gin.H{
-		// 		"username": user.Username,
-		// 		"password": password,
-		// 		"FullName": user.FullName,
-		// 		"email":    user.Email,
+		// 		"username":  user.Username,
+		// 		"password":  password,
+		// 		"full_name": user.FullName,
+		// 		"email":     user.Email,
 		// 	},
 		// 	buildStubs: func(store *mockdb.MockStore) {
 		// 		arg := db.CreateUserParams{
@@ -82,7 +90,7 @@ func TestCreateUserAPI(t *testing.T) {
 		// 	checkResponse: func(recorder *httptest.ResponseRecorder) {
 		// 		// fmt.Println("----- body ---", recorder.Body)
 		// 		// fmt.Println("----- http.StatusOK ---", http.StatusOK)
-		// 		require.NotEqual(t, http.StatusOK, recorder.Code)
+		// 		require.Equal(t, http.StatusOK, recorder.Code)
 		// 		requireBodyMatchUser(t, recorder.Body, user)
 		// 	},
 		// },
