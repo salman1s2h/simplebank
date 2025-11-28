@@ -18,13 +18,14 @@ type Env struct {
 	DBName         string `mapstructure:"DB_NAME"`
 	// AccessTokenExpiryHour  int    `mapstructure:"ACCESS_TOKEN_EXPIRY_HOUR"`
 	// RefreshTokenExpiryHour int    `mapstructure:"REFRESH_TOKEN_EXPIRY_HOUR"`
-	AccessTokenSecret     string        `mapstructure:"ACCESS_TOKEN_SECRET"`
-	RefreshTokenSecret    string        `mapstructure:"REFRESH_TOKEN_SECRET"`
-	DB_DRIVER             string        `mapstructure:"DB_DRIVER"`
-	SERVER_ADDRESS        string        `mapstructure:"SERVER_ADDRESS"`
-	APP_PORT              string        `mapstructure:"APP_PORT"`
-	TOKEN_SYMMETRIC_KEY   string        `mapstructure:"TOKEN_SYMMETRIC_KEY"`
-	ACCESS_TOKEN_DURATION time.Duration `mapstructure:"ACCESS_TOKEN_DURATION"`
+	AccessTokenSecret      string        `mapstructure:"ACCESS_TOKEN_SECRET"`
+	RefreshTokenSecret     string        `mapstructure:"REFRESH_TOKEN_SECRET"`
+	DB_DRIVER              string        `mapstructure:"DB_DRIVER"`
+	SERVER_ADDRESS         string        `mapstructure:"SERVER_ADDRESS"`
+	APP_PORT               string        `mapstructure:"APP_PORT"`
+	TOKEN_SYMMETRIC_KEY    string        `mapstructure:"TOKEN_SYMMETRIC_KEY"`
+	ACCESS_TOKEN_DURATION  time.Duration `mapstructure:"ACCESS_TOKEN_DURATION"`
+	REFRESH_TOKEN_DURATION time.Duration `mapstructure:"REFRESH_TOKEN_DURATION"`
 }
 
 func NewEnv() *Env {
